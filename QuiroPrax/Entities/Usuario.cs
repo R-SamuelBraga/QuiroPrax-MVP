@@ -11,6 +11,6 @@ namespace QuiroPrax.Entities
         public string Email { get; set; }
         public string Telefone { get; set; }
         public required string TipoUsuario { get; set; } // "Cliente" ou "Quiropraxia"
-        
+        public string Senha { get; set; }
     }
 }

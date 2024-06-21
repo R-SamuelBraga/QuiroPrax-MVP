@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QuiroPrax.Context;
 
@@ -11,9 +12,11 @@ using QuiroPrax.Context;
 namespace QuiroPrax.Migrations
 {
     [DbContext(typeof(ConsultaContext))]
-    partial class ConsultaContextModelSnapshot : ModelSnapshot
+    [Migration("20240514195019_QuartaMigration")]
+    partial class QuartaMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,9 +48,6 @@ namespace QuiroPrax.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("FormularioAdmissaoId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -65,8 +65,6 @@ namespace QuiroPrax.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("FormularioAdmissaoId");
 
                     b.ToTable("Clientes");
                 });
@@ -112,15 +110,23 @@ namespace QuiroPrax.Migrations
                     b.Property<bool>("Alergias")
                         .HasColumnType("bit");
 
+                    b.Property<int>("ClienteId")
+                        .HasColumnType("int");
+
                     b.Property<string>("CondicoesMedicas")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IdCliente")
+                        .HasColumnType("int");
 
                     b.Property<string>("ProblemasSaude")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ClienteId");
 
                     b.ToTable("FormulariosAdmissao");
                 });
@@ -150,6 +156,9 @@ namespace QuiroPrax.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("AtendeDomicilio")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Clinica")
                         .IsRequired()
@@ -191,17 +200,6 @@ namespace QuiroPrax.Migrations
                     b.ToTable("Quiropratas");
                 });
 
-            modelBuilder.Entity("QuiroPrax.Entities.Cliente", b =>
-                {
-                    b.HasOne("QuiroPrax.Entities.FormularioAdmissao", "FormularioAdmissao")
-                        .WithMany()
-                        .HasForeignKey("FormularioAdmissaoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("FormularioAdmissao");
-                });
-
             modelBuilder.Entity("QuiroPrax.Entities.Consulta", b =>
                 {
                     b.HasOne("QuiroPrax.Entities.Cliente", "Cliente")
@@ -221,6 +219,17 @@ namespace QuiroPrax.Migrations
                     b.Navigation("Quiroprata");
                 });
 
+            modelBuilder.Entity("QuiroPrax.Entities.FormularioAdmissao", b =>
+                {
+                    b.HasOne("QuiroPrax.Entities.Cliente", "Cliente")
+                        .WithMany("FormularioAdmissao")
+                        .HasForeignKey("ClienteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cliente");
+                });
+
             modelBuilder.Entity("QuiroPrax.Entities.NotificacaoEmail", b =>
                 {
                     b.HasOne("QuiroPrax.Entities.Consulta", "Consulta")
@@ -235,6 +244,8 @@ namespace QuiroPrax.Migrations
             modelBuilder.Entity("QuiroPrax.Entities.Cliente", b =>
                 {
                     b.Navigation("Consultas");
+
+                    b.Navigation("FormularioAdmissao");
                 });
 
             modelBuilder.Entity("QuiroPrax.Entities.Quiroprata", b =>
